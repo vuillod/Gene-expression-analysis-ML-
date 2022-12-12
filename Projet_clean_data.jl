@@ -62,16 +62,31 @@ end
 
 # ╔═╡ ebf40c1e-4f3d-442f-972e-74f177e0188a
 begin
-	pca_train_data_wl = fit!(machine(PCA(variance_ratio = 0.93), new_train_data_without_labels2), verbosity = 0)
+	pca_machine_train_data = fit!(machine(PCA(variance_ratio = 0.93), new_train_data_without_labels2), verbosity = 0)
 end
 
+# ╔═╡ 2f8d1e13-2c7e-48f5-9ee0-9b95f78250b9
+data_train_without_label_pca = MLJ.transform(pca_machine_train_data, new_train_data_without_labels2)
+
+# ╔═╡ e38f5a19-62bc-48b9-aa1b-2576e17489ba
+size(data_train_without_label_pca)
+
+# ╔═╡ 83793f4e-182c-4f73-aa52-11d6933111f6
+names(data_train_without_label_pca)
+
+# ╔═╡ 5f6f4c17-794d-4e11-bc8c-2a339083f5d5
+data_test_pca= MLJ.transform(pca_machine_train_data, clean_data_test2)
+
+# ╔═╡ 320db0b0-28ec-4dea-a72a-c3df1599ed5c
+size(data_test_pca)
+
 # ╔═╡ 4829f515-7bec-4ef2-a5cd-50637ee2c711
-clean_data_train = hcat(new_train_data_without_labels2, train_labels)
+clean_data_train = hcat(data_train_without_label_pca, train_labels)
 
 # ╔═╡ be344bfb-75d9-4d34-b46e-b6b770afff1f
 begin
 	serialize("clean_data_train.dat", clean_data_train)
-	serialize("clean_data_test.dat", clean_data_test2)
+	serialize("clean_data_test.dat", data_test_pca)
 end
 
 # ╔═╡ Cell order:
@@ -89,5 +104,10 @@ end
 # ╠═ef96207b-2bf5-4433-a538-006a7d0e2e0b
 # ╠═c3ff62b1-2fb9-4604-83ef-90eaf70f0606
 # ╠═ebf40c1e-4f3d-442f-972e-74f177e0188a
+# ╠═2f8d1e13-2c7e-48f5-9ee0-9b95f78250b9
+# ╠═e38f5a19-62bc-48b9-aa1b-2576e17489ba
+# ╠═83793f4e-182c-4f73-aa52-11d6933111f6
+# ╠═5f6f4c17-794d-4e11-bc8c-2a339083f5d5
+# ╠═320db0b0-28ec-4dea-a72a-c3df1599ed5c
 # ╠═4829f515-7bec-4ef2-a5cd-50637ee2c711
 # ╠═be344bfb-75d9-4d34-b46e-b6b770afff1f
