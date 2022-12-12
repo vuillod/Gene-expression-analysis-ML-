@@ -11,7 +11,7 @@ begin
 end
 
 # ╔═╡ e26ffe18-fe92-48ba-859e-6e7fd5c1af11
-using DataFrames, CSV, MLJ, MLJLinearModels, Optim, MLCourse, Distributions, Plots,  Random, OpenML, Statistics, Serialization
+using DataFrames, CSV, MLJ, MLJLinearModels, Optim, MLCourse, Distributions, Plots,  Random, OpenML, Statistics, Serialization 
 
 # ╔═╡ ff7be794-4b9b-4192-bc00-272548c19a3d
 begin 
@@ -30,7 +30,7 @@ end
 
 # ╔═╡ 3aaeeaa0-4fce-4c7f-8549-051b88d57393
 begin
-	solver = MLJLinearModels.LBFGS(optim_options = Optim.Options(time_limit = 20))
+	solver = MLJLinearModels.LBFGS(optim_options = Optim.Options(time_limit = 100))
 	model1 = LogisticClassifier(penalty = :l2, lambda = 1e-4, solver = solver)
 	clean_data_train.labels = categorical(clean_data_train.labels, levels=["KAT5","eGFP","CBP"], ordered = true)
     m = machine(model1, select(clean_data_train,Not(:labels)),clean_data_train.labels)
@@ -70,10 +70,10 @@ losses(m, select(clean_data_test, Not(:labels)), clean_data_test.labels)
 function tune_model_labels(model, data,)
 	tuned_model = TunedModel(model = model,
 	                         resampling = CV(nfolds = 10),
-	                         tuning = Grid(goal=10),
+	                         tuning = Grid(goal=20),
 	                         range = range(model, :lambda,
 									       scale = :log10,
-									       lower = 1e-30, upper = 1e-1),
+									       lower = 1e-20, upper = 1e-1),
 	                         measure = accuracy)
 	self_tuned_mach = machine(tuned_model, select(data, Not(:labels)), data.labels)
 	fit!(self_tuned_mach, verbosity = 2)
@@ -85,6 +85,40 @@ ridge_res = tune_model_labels(LogisticClassifier(penalty = :l2, solver = solver)
 # ╔═╡ 37ec27ef-2489-4832-9ce9-0aa192513058
 fitted_params(ridge_res)
 
+# ╔═╡ 2cdd3568-f8a4-4e0c-b580-ede0eb3d8e49
+	
+
+
+# ╔═╡ 60fa9f19-afad-42b2-8232-28d2844c4726
+plot(ridge_res)
+
+# ╔═╡ 1cf6a8ae-0d21-44f2-a90f-bb48790af092
+lasso_res = tune_model_labels(LogisticClassifier(penalty = :l1, solver = solver), clean_data)
+
+# ╔═╡ bd710df3-15aa-4d4e-9790-17651f8742a3
+plot(lasso_res)
+
+# ╔═╡ 0a806c9c-ae2e-4e7f-af36-e094cd713550
+#-----------------------------------------------------------------------------
+#KAGGLE SUBMISSION :
+
+# ╔═╡ 91aced6a-e7eb-4695-aab0-5817e8b5a94a
+begin 
+	ridge_predict = predict_mode(ridge_res,test_data)
+	kaggle_ridge = DataFrame(id=index[:], prediction = ridge_predict)
+	CSV.write(pwd()*"\\res_predictions_ridge.csv",kaggle_ridge)
+end
+
+# ╔═╡ 74398180-f16d-479b-ad9e-b3479fac778c
+
+
+# ╔═╡ 521c3dc7-7d33-4fb5-9b6d-3b1e88cde101
+begin 
+	lasso_predict = predict_mode(lasso_res,test_data)
+	kaggle_lasso = DataFrame(id=index[:], prediction = lasso_predict)
+	CSV.write(pwd()*"\\res_predictions_lasso.csv",kaggle_lasso)
+end
+
 # ╔═╡ 782ebfd3-34fd-4583-adf6-4d1e14c8d782
 begin
 	index = []
@@ -93,21 +127,12 @@ begin
 	end
 end
 
-# ╔═╡ 2cdd3568-f8a4-4e0c-b580-ede0eb3d8e49
-	size(index)
-
-
-# ╔═╡ 60fa9f19-afad-42b2-8232-28d2844c4726
-plot(ridge_res)
-
-# ╔═╡ 0a806c9c-ae2e-4e7f-af36-e094cd713550
-
-
-# ╔═╡ 91aced6a-e7eb-4695-aab0-5817e8b5a94a
-begin 
-	ridge_predict = predict_mode(ridge_res,test_data)
-	kaggle_ridge = DataFrame(id=index[:], prediction = ridge_predict)
-	CSV.write(pwd()*"\\res_predictions.csv",kaggle_ridge)
+# ╔═╡ d8e64cae-5d6f-4b9a-8ccf-d64aabab76e5
+begin
+	index = []
+	for i in 1:3093
+		push!(index,i)
+	end
 end
 
 # ╔═╡ Cell order:
@@ -128,5 +153,10 @@ end
 # ╠═782ebfd3-34fd-4583-adf6-4d1e14c8d782
 # ╠═2cdd3568-f8a4-4e0c-b580-ede0eb3d8e49
 # ╠═60fa9f19-afad-42b2-8232-28d2844c4726
+# ╠═1cf6a8ae-0d21-44f2-a90f-bb48790af092
+# ╠═bd710df3-15aa-4d4e-9790-17651f8742a3
 # ╠═0a806c9c-ae2e-4e7f-af36-e094cd713550
+# ╠═d8e64cae-5d6f-4b9a-8ccf-d64aabab76e5
 # ╠═91aced6a-e7eb-4695-aab0-5817e8b5a94a
+# ╠═74398180-f16d-479b-ad9e-b3479fac778c
+# ╠═521c3dc7-7d33-4fb5-9b6d-3b1e88cde101
