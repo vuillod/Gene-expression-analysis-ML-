@@ -30,7 +30,7 @@ end
 
 # ╔═╡ 3aaeeaa0-4fce-4c7f-8549-051b88d57393
 begin
-	solver = MLJLinearModels.LBFGS(optim_options = Optim.Options(time_limit = 300))
+	solver = MLJLinearModels.LBFGS(optim_options = Optim.Options(time_limit = 20))
 	model1 = LogisticClassifier(penalty = :l2, lambda = 1e-4, solver = solver)
 	clean_data_train.labels = categorical(clean_data_train.labels, levels=["KAT5","eGFP","CBP"], ordered = true)
     m = machine(model1, select(clean_data_train,Not(:labels)),clean_data_train.labels)
@@ -85,6 +85,31 @@ ridge_res = tune_model_labels(LogisticClassifier(penalty = :l2, solver = solver)
 # ╔═╡ 37ec27ef-2489-4832-9ce9-0aa192513058
 fitted_params(ridge_res)
 
+# ╔═╡ 782ebfd3-34fd-4583-adf6-4d1e14c8d782
+begin
+	index = []
+	for i in 1:3093
+		push!(index,i)
+	end
+end
+
+# ╔═╡ 2cdd3568-f8a4-4e0c-b580-ede0eb3d8e49
+	size(index)
+
+
+# ╔═╡ 60fa9f19-afad-42b2-8232-28d2844c4726
+plot(ridge_res)
+
+# ╔═╡ 0a806c9c-ae2e-4e7f-af36-e094cd713550
+
+
+# ╔═╡ 91aced6a-e7eb-4695-aab0-5817e8b5a94a
+begin 
+	ridge_predict = predict_mode(ridge_res,test_data)
+	kaggle_ridge = DataFrame(id=index[:], prediction = ridge_predict)
+	CSV.write(pwd()*"\\res_predictions.csv",kaggle_ridge)
+end
+
 # ╔═╡ Cell order:
 # ╠═a001cc30-771e-11ed-0bc5-a37734fc6a0e
 # ╠═e26ffe18-fe92-48ba-859e-6e7fd5c1af11
@@ -100,3 +125,8 @@ fitted_params(ridge_res)
 # ╠═899754cf-7d00-4633-a83f-fcc973e8fc0e
 # ╠═78fba11f-db27-4282-895a-f528b54980d1
 # ╠═37ec27ef-2489-4832-9ce9-0aa192513058
+# ╠═782ebfd3-34fd-4583-adf6-4d1e14c8d782
+# ╠═2cdd3568-f8a4-4e0c-b580-ede0eb3d8e49
+# ╠═60fa9f19-afad-42b2-8232-28d2844c4726
+# ╠═0a806c9c-ae2e-4e7f-af36-e094cd713550
+# ╠═91aced6a-e7eb-4695-aab0-5817e8b5a94a
