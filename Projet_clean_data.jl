@@ -62,7 +62,7 @@ end
 
 # ╔═╡ ebf40c1e-4f3d-442f-972e-74f177e0188a
 begin
-	pca_machine_train_data = fit!(machine(PCA(variance_ratio = 0.93), new_train_data_without_labels2), verbosity = 0)
+	pca_machine_train_data = fit!(machine(PCA(variance_ratio = 0.975), new_train_data_without_labels2), verbosity = 0)
 end
 
 # ╔═╡ 2f8d1e13-2c7e-48f5-9ee0-9b95f78250b9
