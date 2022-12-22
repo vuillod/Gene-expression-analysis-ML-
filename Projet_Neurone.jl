@@ -26,55 +26,70 @@ test_data = deserialize("clean_data_test.dat")
 size(test_data)
 
 # ╔═╡ e954a626-e3e5-43b6-ba44-44a66f1b3f7e
-"""
+
 begin
-	mutable struct mybuilder <: MLJFLux.Builder 
-		n_hidden1::Int 
-		n_hidden2::Int
-		dropout::Float64
-		σ
-	end 
-	mybuilder(; n_hidden1 = 10, n_hidden2 = 10, dropout = 0.5, σ = Flux.relu) = mybuilder(n_hidden1, n_hidden2, dropout, σ)
-	function MLJFlux.build(builder::mybuilder, rng, n_in, n_out)
-		init = MLJFlux.glorot_uniform(rng)
-		return Flux.Chain(
-			Flux.Dense(n_in, builder.n_hidden1, builder.σ, init = init),
-			Flux.Dropout(builder.dropout),
-			Flux.Dense(builder.n_hidden1, builder.n_hidden2, builder.σ, init = init), 
-			Flux.Dropout(builder.dropout), 
-			Flux.Dense(builder.n_hidden2, n_out, init = init))
+	# Builder for NeuralNetworkClassifier
+	mutable struct MyBuilder <:  MLJFlux.Builder
+    	n_hidden1::Int
+    	n_hidden2::Int     # if zero use geometric mean of input/output
+    	dropout::Float64
+    	σ
+	end
+	MyBuilder(; n_hidden1=10,n_hidden2=10, dropout=0.5, σ=Flux.relu) = MyBuilder(n_hidden1,n_hidden2, dropout, σ)
+	function MLJFlux.build(builder::MyBuilder, rng, n_in, n_out)
+    	init=Flux.glorot_uniform(rng)
+    	return Flux.Chain(
+        	Flux.Dense(n_in, builder.n_hidden1, builder.σ, init=init),
+        	Flux.Dropout(builder.dropout),
+        	Flux.Dense(builder.n_hidden1, builder.n_hidden2, builder.σ, init=init),
+        	Flux.Dropout(builder.dropout),
+        	Flux.Dense(builder.n_hidden2, n_out, init=init))
 	end
 end
-"""
+
 
 # ╔═╡ 9eb88425-48ad-45af-b564-031bcbd111e1
-"""
+
 begin
-	model2 = NeuralNetworkClassifier(builder = mybuilder(n_hidden1 = 300, n_hidden2 = 											50, dropout = 0.5, σ=Flux.relu),
+	Random.seed!(0)
+	model2 = NeuralNetworkClassifier(builder = MyBuilder( σ=Flux.relu),
     								optimiser = ADAM(),
                              		batch_size = 32, 
 									alpha = 1)
                        
 	tuned_model = TunedModel(model = model2,
-							  resampling = Holdout(fraction_train = 0.7),
-	                          range = [range(model2,
-						                :lambda,
-							  			scale = :log10, lower = 1e-12, upper = 1e-6)
+							  resampling = Holdout(fraction_train = 0.8),
+								tuning = Grid(goal=12),
+	                          
+								range = [
+									range(model2,
+									:(builder.n_hidden1), values=[100,400]),
+									range(model2,
+									:(builder.n_hidden2), values=[40,60]),
+						            range(model2,   
+									:lambda,
+							  			
+									values = [1.23285e-9]),
 								       range(model2,
 									     :epochs,
-									     values = [250, 500, 1000])],
+									     values = [50,100,200]),
+										range(model2,
+									:(builder.dropout), values=[0.7])
+								],
 	                          measure = accuracy)
-	neuron_mach = fit!(machine(tuned_model,
-	                     select(clean_data, Not(:labels)), verbosity = 0))
+	neuron_mach = machine(tuned_model,
+	                     select(clean_data, Not(:labels)), clean_data.labels)
+	fit!(neuron_mach, verbosity = 2)
 end
-"""
+
 
 # ╔═╡ 931500c4-7b09-4c1e-ae9b-4837b539bb6c
 
 
 # ╔═╡ 83c54600-2bcb-441d-ab0b-54b67e5372c3
+"""
 begin 
-	model2 = NeuralNetworkClassifier(builder =  MLJFlux.Short(n_hidden = 300, 
+	model2 = NeuralNetworkClassifier(builder =  MLJFlux.Short(n_hidden = 400, 
 															dropout = 0.6,
                                                       σ = relu),
     								optimiser = ADAM(),
@@ -82,10 +97,11 @@ begin
 									alpha = 1)
 	
 	tuned_model = TunedModel(model = model2,
-							  resampling = Holdout(fraction_train = 0.8),
-	                          range = [range(model2,
+							  	resampling = Holdout(fraction_train = 0.8),
+								tuning = Grid(goal=2),
+								range = [range(model2,
 						                :lambda,
-							  			scale = :log10, lower = 1e-8, upper = 1e-7)
+							  			scale = :log10, lower = 1e-9, upper = 1e-8)
 								       range(model2,
 									     :epochs,
 									     values = [500])],
@@ -94,12 +110,16 @@ begin
 	                     select(clean_data, Not(:labels)), clean_data.labels)
 	fit!(neuron_mach, verbosity = 2)
 end
+"""
 
 # ╔═╡ b41d3380-e157-4587-9a44-1cbc56ce5939
 neuron_res = predict_mode(neuron_mach, test_data)
 
 # ╔═╡ 6044a3c6-33b3-40af-9c8d-66c9ee14b24e
-plot(neuron_res)
+report(neuron_mach)
+
+# ╔═╡ a610da8c-d0ee-40e7-92c4-f8e0d0f245ac
+plot(neuron_mach)
 
 # ╔═╡ 7b31c8ec-1293-48fb-8aba-80a947a974c0
 #KAGGLE SUBMISSION
@@ -111,7 +131,7 @@ begin
 		push!(index,i)
 	end
 	kaggle_neuron = DataFrame(id=index[:], prediction = neuron_res)
-	CSV.write(pwd()*"\\res_predictions_neuron.csv", kaggle_neuron)
+	CSV.write(pwd()*"\\res_predictions_neuronsss.csv", kaggle_neuron)
 end
 
 # ╔═╡ Cell order:
@@ -126,5 +146,6 @@ end
 # ╠═83c54600-2bcb-441d-ab0b-54b67e5372c3
 # ╠═b41d3380-e157-4587-9a44-1cbc56ce5939
 # ╠═6044a3c6-33b3-40af-9c8d-66c9ee14b24e
+# ╠═a610da8c-d0ee-40e7-92c4-f8e0d0f245ac
 # ╠═7b31c8ec-1293-48fb-8aba-80a947a974c0
 # ╠═72975521-b08e-46db-bdff-a13cf93e752d
