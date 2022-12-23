@@ -11,10 +11,10 @@ using Pkg; Pkg.activate(joinpath(Pkg.devdir(), "MLCourse"))
 using DataFrames, CSV, MLJ, MLJLinearModels, MLCourse, Distributions, Plots,  Random, OpenML, Statistics, Serialization, MLJMultivariateStatsInterface
 
 # ╔═╡ fe75abdd-33a2-444a-86f6-23f1884f091c
-data_init = CSV.read(pwd() * "\\train.csv", DataFrame)
+data_init = CSV.read(pwd() * "\\train.csv.gz", DataFrame)
 
 # ╔═╡ 80136d53-d343-4f6a-bd67-d2824ef6d70e
-test_init = CSV.read(pwd() * "\\test.csv", DataFrame)
+test_init = CSV.read(pwd() * "\\test.csv.gz", DataFrame)
 
 # ╔═╡ 17978cb9-6c8c-4001-b817-1c74e1d5ceda
 #---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ begin
 	for elem in tab
 		push!(new_t, elem[1])
 	end
-	#mtn qu'on a les index, faut enlever les colonnes correspondantes
+	#getting the index to remove
 end
 
 # ╔═╡ ef96207b-2bf5-4433-a538-006a7d0e2e0b
@@ -55,6 +55,9 @@ begin
 	new_train_data_without_labels2 = select(new_train_data_without_labels, Not(unique(new_t)))
 	clean_data_test2 = select(clean_data_test1, Not(unique(new_t)))
 end
+
+# ╔═╡ d175fd55-77dd-4b1b-8db3-b862de582030
+#Note : Those manipulations (suppression of the constant and correlate predictors) could have been done by the PCA, but we did them before and we did not want to supress them, in order to show our work.
 
 # ╔═╡ c3ff62b1-2fb9-4604-83ef-90eaf70f0606
 #---------------------------------------------------------------------------------
@@ -102,6 +105,7 @@ end
 # ╠═bddd5feb-cda1-44fd-bd1d-40e2833c122e
 # ╠═53c3b744-d272-430b-8745-fc0cd2e4ae03
 # ╠═ef96207b-2bf5-4433-a538-006a7d0e2e0b
+# ╠═d175fd55-77dd-4b1b-8db3-b862de582030
 # ╠═c3ff62b1-2fb9-4604-83ef-90eaf70f0606
 # ╠═ebf40c1e-4f3d-442f-972e-74f177e0188a
 # ╠═2f8d1e13-2c7e-48f5-9ee0-9b95f78250b9
