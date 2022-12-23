@@ -71,12 +71,10 @@ function tune_model_labels(model, data,)
 	fit!(self_tuned_mach, verbosity = 2)
 end
 
-# ╔═╡ 95bd28ed-0e02-45f6-89ec-08ce953f2ac0
-#RIDGE CLASSIFIER :
-
 # ╔═╡ 78fba11f-db27-4282-895a-f528b54980d1
 md"
 ```julia
+#Ridge classifier
 #Good to precise that the lambda was tuned for the Lasso only
 
 ridge_res = tune_model_labels(LogisticClassifier(penalty = :l2), clean_data)
@@ -114,14 +112,6 @@ end
 ```
 "
 
-# ╔═╡ 782ebfd3-34fd-4583-adf6-4d1e14c8d782
-begin
-	index = []
-	for i in 1:3093
-		push!(index,i)
-	end
-end
-
 # ╔═╡ 377ca4d4-a65b-4737-8cbb-4ce9c42e7f16
 #LASSO CLASSIFIER :
 
@@ -137,8 +127,16 @@ fitted_params(lasso_res)
 # ╔═╡ 8e1bf001-ea47-42df-8f74-87c70b96eba5
 report(lasso_res)
 
-# ╔═╡ 521c3dc7-7d33-4fb5-9b6d-3b1e88cde101
+# ╔═╡ 782ebfd3-34fd-4583-adf6-4d1e14c8d782
 #KAGGLE :
+begin
+	index = []
+	for i in 1:3093
+		push!(index,i)
+	end
+end
+
+# ╔═╡ 521c3dc7-7d33-4fb5-9b6d-3b1e88cde101
 begin 
 	lasso_predict = predict_mode(lasso_res,test_data)
 	kaggle_lasso = DataFrame(id=index[:], prediction = lasso_predict)
@@ -153,15 +151,14 @@ end
 # ╟─fc83ce73-bd06-44e3-aa19-6ea46a834f0d
 # ╟─75fbcf05-dcec-48f9-978c-77f4918995bb
 # ╠═899754cf-7d00-4633-a83f-fcc973e8fc0e
-# ╠═95bd28ed-0e02-45f6-89ec-08ce953f2ac0
 # ╟─78fba11f-db27-4282-895a-f528b54980d1
 # ╟─37ec27ef-2489-4832-9ce9-0aa192513058
 # ╟─60fa9f19-afad-42b2-8232-28d2844c4726
 # ╟─e9b7a7a2-4d2e-4b14-8e4e-456fdbc98497
-# ╠═782ebfd3-34fd-4583-adf6-4d1e14c8d782
 # ╠═377ca4d4-a65b-4737-8cbb-4ce9c42e7f16
 # ╠═1cf6a8ae-0d21-44f2-a90f-bb48790af092
 # ╠═bd710df3-15aa-4d4e-9790-17651f8742a3
 # ╠═79641c51-0d48-4735-83ce-ffd97457d2c4
 # ╠═8e1bf001-ea47-42df-8f74-87c70b96eba5
+# ╠═782ebfd3-34fd-4583-adf6-4d1e14c8d782
 # ╠═521c3dc7-7d33-4fb5-9b6d-3b1e88cde101
