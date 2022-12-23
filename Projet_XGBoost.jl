@@ -20,6 +20,21 @@ end
 # ╔═╡ 44dc7ef1-3211-4ad6-b9a5-13098f782a6d
 test_data = deserialize("clean_data_test.dat")
 
+# ╔═╡ cdfd7f58-07f7-4f5d-aa9d-fc39e59b3cf3
+md"
+```julia
+#XGBoost
+
+Here is the list of the range we tried for every hyperparameter for the XGBoost :
+
+	- eta : from 0 to 1.
+	- num_round : from 1 to 100.
+	- max_depth : from 2 to 50.
+
+We also tried to tune the gamma parameter, but it has no impact on our predictions.
+```
+"
+
 # ╔═╡ c9c6585f-81b0-4fa3-a3dc-c5c72a0d6f75
 begin
 	model = XGBoostClassifier(booster = "gblinear")
@@ -63,6 +78,7 @@ end
 # ╠═4a6be16e-810f-11ed-1d33-c3430b52b428
 # ╠═6c88f9db-8d5c-452a-a7e8-1e3d609c9d5b
 # ╠═44dc7ef1-3211-4ad6-b9a5-13098f782a6d
+# ╟─cdfd7f58-07f7-4f5d-aa9d-fc39e59b3cf3
 # ╠═c9c6585f-81b0-4fa3-a3dc-c5c72a0d6f75
 # ╠═e65d5410-eef6-497d-94c1-d70dc3b53615
 # ╠═338d3c05-834c-4d61-9027-53ea9025ecd9
