@@ -47,7 +47,6 @@ confusion_matrix(KMeans_predict, clean_data.labels)
 # ╔═╡ 76764df6-e5ef-4864-8c25-4d29401ecd3e
 #DBSCAN
 begin 
-	Random.seed!(0)
 	dbscan_mach = machine(DBSCAN(min_cluster_size = 50, radius = 0.5))
 	DBSCAN_pred = predict(dbscan_mach, select(clean_data, Not(:labels)))
 end
