@@ -33,6 +33,7 @@ Let the notebook run and the predicitons will be saved in a file named res_predi
 **Projet_arbres.jl :**
 
 The notebook will run and a file named res_predictions_forest.csv is saved in the folder. The notebook will run a big tuning model (goal = 147), but it is not necessary to run it, because the predicitons are not relevant (best result = 60%), we just let it here to show our work. 
+Note : - We use a predefined seed to make the predicitons reproducible.
 
 
 **Projet_Neurone.jl :**
@@ -40,11 +41,14 @@ The notebook will run and a file named res_predictions_forest.csv is saved in th
 We perform to kind of Neuronal Network classification in this note book : one with a single hidden layer and one with two hidden layers. 
 We obtain the best result with the two hidden layers, that is why we let run only this one, but the other one is still present in disable cells.
 Let the notebook run and the predicitons will be saved in a file named res_predictions_neurone.csv
+Note : - We use a predefined seed to make the predicitons reproducible.
+
 
 **Projet_XGBoost.jl :**
 
 We perform a Gradient Boost methods in this notebook. In a comment cell, you can see the different values we used to tune our model.
-Let the notebook run and the predicitons will be saved in a file named res_predictions_xgboost.csv.
+Let the notebook run and the predicitons will be saved in a file named res_predictions_xgboost.csv
+
 
 **Projet_Clustering.jl :**
 
